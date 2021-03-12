@@ -49,7 +49,8 @@ def train(dataset_path,
         train_nbatches, 
         val_nbatches,
         batch_size, 
-        seq_len) 
+        seq_len,
+        50000) 
 
     model = tf.keras.models.load_model(model_path)
     model.compile('adam', 'sparse_categorical_crossentropy', ['accuracy'])
@@ -57,6 +58,7 @@ def train(dataset_path,
 
 #    embeddings = model.layers[0].weights[0].numpy() 
 #    export_embeddings(embeddings, logs_path)
+    export_vocabulary(labels_path, tokenizer.num_words, tokenizer.word_index)
 
     ckp_cb = tf.keras.callbacks.ModelCheckpoint(
         model_path,
@@ -67,7 +69,7 @@ def train(dataset_path,
         create_lr_sched(epochs/2, epochs, warmup=warmup), True)
 
     tb_cb = tf.keras.callbacks.TensorBoard(
-            logs_path, 10, True, True, 
+            logs_path, 10, True,  
             embeddings_freq=10,  
             embeddings_metadata=labels_path)
 

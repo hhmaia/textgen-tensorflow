@@ -19,7 +19,8 @@ def _verses_tape(verses):
 
 
 def json_to_verses(path):
-    return [verse for book in json.load(codecs.open(path, 'r', 'utf-8-sig')) 
+    books = json.load(codecs.open(path, 'r', 'utf-8-sig')) 
+    return [verse for book in books[:5] 
         for chapter in book['chapters']
         for verse in chapter]
 

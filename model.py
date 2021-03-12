@@ -8,9 +8,9 @@ def export_model(path, input_seq_len, vocab_size, emb_dim):
    
     model = tf.keras.Sequential([
         klayers.Embedding(vocab_size+1, emb_dim, input_length=input_seq_len),
-        klayers.Bidirectional(klayers.LSTM(512)),
+        klayers.Bidirectional(klayers.LSTM(256)),
         klayers.BatchNormalization(),
-        klayers.Flatten(),
+        #klayers.Flatten(),
         klayers.Dense(vocab_size, 'softmax')
     ])
 
