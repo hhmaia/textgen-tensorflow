@@ -48,7 +48,7 @@ def train(dataset_path,
         create_lr_sched(epochs/2, epochs, warmup=warmup), True)
 
     tb_cb = tf.keras.callbacks.TensorBoard(
-            logs_path, 10, True, embeddings_freq=10)  
+            logs_path, 1, True, embeddings_freq=1)  
 
     hist = model.fit(
         train_ds, 
