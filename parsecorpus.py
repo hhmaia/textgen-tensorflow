@@ -25,7 +25,7 @@ def json_to_verses(path):
 
 
 def json_to_tape(path):
-    return _verses_tape(_json_to_verses(path))
+    return _verses_tape(json_to_verses(path))
 
 
 if __name__ == '__main__': 
