@@ -18,18 +18,18 @@ def export_tokenizer(tok_fp, texts_fp, max_vocab_size=None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Utility for creating and saving a tokenizer as json')
+        description='Utility for creating and saving a tokenizer as json.')
 
     parser.add_argument('-o', '--tok_path', type=partial(open, mode='w'),
         required=False,
-        default='tokenizer.json',
-        help='file name to save the json output')
+        default=sys.stdout,
+        help='File name to save the json output. Defaults to stdout.')
 
     parser.add_argument('-p', '--texts_path', type=open, required=False, default=sys.stdin,
-        help='input from which to generate the tokenizer') 
+        help='File to generate the tokenizer from. Defaults to stdin.') 
 
     parser.add_argument('-v', '--max_vocab_size', type=int, required=False, default=None,
-        help='Maximum vocabulary size')
+        help='Maximum vocabulary size. Default is full vocabulary.')
 
     args = parser.parse_args()
     export_tokenizer(args.tok_path, args.texts_path, args.max_vocab_size)
