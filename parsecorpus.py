@@ -18,14 +18,14 @@ def _verses_tape(verses):
     return ''.join(_replace_tokens(verse) for verse in verses) 
 
 
-def json_verses(path):
+def json_to_verses(path):
     return [verse for book in json.load(codecs.open(path, 'r', 'utf-8-sig')) 
         for chapter in book['chapters']
         for verse in chapter]
 
 
-def json_tape(path):
-    return _verses_tape(_json_verses(path))
+def json_to_tape(path):
+    return _verses_tape(_json_to_verses(path))
 
 
 if __name__ == '__main__': 
@@ -36,10 +36,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
     try:
         if args.verses:
-            for line in json_verses(args.path):
+            for line in json_to_verses(args.path):
                 print(line)
         else: 
-            print(json_tape(args.path))
+            print(json_to_tape(args.path))
 
     except BrokenPipeError:
         pass
