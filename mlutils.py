@@ -45,6 +45,10 @@ def export_vocabulary(path, vocab_size, word_index):
         # padding
         f.writelines(['0\n'])
         words = list(word_index.keys())
+        if '\n' in words:
+            index = words.index('\n')
+            words.remove('\n')
+            words.insert(index, '\\n')
         f.write('\n'.join(words[:vocab_size]))
 
 

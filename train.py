@@ -10,22 +10,10 @@ from parsecorpus import json_to_tape
 from mlutils import create_lr_sched, export_embeddings, export_vocabulary 
 
 
-def check_dirs(run_hash):
-    model_path = os.path.join('build', run_hash, 'model')
-    assets_path = os.path.join(model_path, 'assets') 
-    logs_path = os.path.join(assets_path, 'logs')
-    tok_path = os.path.join(assets_path, 'tokenizer.json')
-
-    try:
-        os.listdir(logs_path)
-    except FileNotFoundError:
-        os.makedirs(logs_path)
-
-    return logs_path, model_path, tok_path, assets_path
-
-
 def train(dataset_path,
-        run_hash,
+        model_path,
+        tokenizer_path,
+        logs_path,
         warmup=False,
         seq_len=32, 
         batch_size=128,
@@ -33,10 +21,7 @@ def train(dataset_path,
         train_split = 0.8,
         val_split = 0.2):
     
-    logs_path, model_path, tok_path, assets_path = check_dirs(run_hash)
-    labels_path = os.path.join(assets_path, 'labels.tsv')
-
-    with open(tok_path, 'r') as f:
+    with open(tokenizer_path, 'r') as f:
         tokenizer = tokenizer_from_json(f.read())
 
     tape = json_to_tape(dataset_path)
@@ -56,22 +41,14 @@ def train(dataset_path,
     model.compile('adam', 'sparse_categorical_crossentropy', ['accuracy'])
     model.summary()
 
-#    embeddings = model.layers[0].weights[0].numpy() 
-#    export_embeddings(embeddings, logs_path)
-    export_vocabulary(labels_path, tokenizer.num_words, tokenizer.word_index)
-
     ckp_cb = tf.keras.callbacks.ModelCheckpoint(
-        model_path,
-        'val_accuracy',
-        save_best_only=True)
+        model_path, 'val_accuracy', save_best_only=True)
 
     lr_cb = tf.keras.callbacks.LearningRateScheduler(
         create_lr_sched(epochs/2, epochs, warmup=warmup), True)
 
     tb_cb = tf.keras.callbacks.TensorBoard(
-            logs_path, 10, True,  
-            embeddings_freq=10,  
-            embeddings_metadata=labels_path)
+            logs_path, 10, True, embeddings_freq=10)  
 
     hist = model.fit(
         train_ds, 
@@ -83,11 +60,29 @@ def train(dataset_path,
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Script for training the NLP model')
-    parser.add_argument('dataset', type=str)
-    parser.add_argument('run_hash', type=str)
-    parser.add_argument('epochs', type=int)
+    parser = argparse.ArgumentParser(description='Script for training the model.')
+    parser.add_argument('-d', '--dataset', type=str, required=True,
+            help='Path to the dataset to train on.')
+    parser.add_argument('-m', '--model', type=str, required=True, 
+            help='Path to the directory where to find the model to be loaded.')
+    parser.add_argument('-t', '--tokenizer', type=str, required=True, 
+            help='Path to the tokenizer JSON file.')
+    parser.add_argument('-l', '--logs', type=str, required=True, 
+            help='Path to the directory where to save Tensorboad logs.')
+    parser.add_argument('-e', '--epochs', type=int, required=False, default='1',
+            help='Number of epochs to train.')
+    parser.add_argument('-b', '--batch_size', type=int, required=False, default='128',
+            help='Batch size to use when creating the dataset')
+    parser.add_argument('-w', '--warmup', action='store_true', 
+            help='Wheter to gradualy increase learning rate at the start of the training.')
     args = parser.parse_args()
 
-    train(args.dataset, args.run_hash, epochs=args.epochs)
+    train(args.dataset,
+            args.model,
+            args.tokenizer,
+            args.logs,
+            args.warmup,
+            batch_size=args.batch_size, 
+            epochs=args.epochs)
+
 

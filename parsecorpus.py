@@ -20,7 +20,7 @@ def _verses_tape(verses):
 
 def json_to_verses(path):
     books = json.load(codecs.open(path, 'r', 'utf-8-sig')) 
-    return [verse for book in books[:5] 
+    return [verse for book in books 
         for chapter in book['chapters']
         for verse in chapter]
 
@@ -30,10 +30,11 @@ def json_to_tape(path):
 
 
 if __name__ == '__main__': 
-    parser = argparse.ArgumentParser('preprocessing tool for bible on json format')
-    parser.add_argument('-p', '--path', type=str, required=True, help='path for the json file')
+    parser = argparse.ArgumentParser('Preprocessing tool for bible on json format.')
+    parser.add_argument('-p', '--path', type=str, required=True,
+            help='Path for the json file.')
     parser.add_argument('-v', '--verses', action='store_true',
-            help='output is one line per verse instead of tape')
+            help='Output is one line per verse instead of tape.')
     args = parser.parse_args()
     try:
         if args.verses:
