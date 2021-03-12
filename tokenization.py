@@ -8,6 +8,7 @@ import tensorflow as tf
 from functools import partial
 from tensorflow.keras.preprocessing.text import Tokenizer 
 
+
 def export_tokenizer(tok_fp, texts_fp, max_vocab_size=None):
     tok = Tokenizer(max_vocab_size, filters='')
     tok.fit_on_texts(texts_fp.readlines())
@@ -17,7 +18,7 @@ def export_tokenizer(tok_fp, texts_fp, max_vocab_size=None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Utility for saving a tokenizer as json')
+        description='Utility for creating and saving a tokenizer as json')
 
     parser.add_argument('-o', '--tok_path', type=partial(open, mode='w'),
         required=False,
@@ -32,3 +33,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     export_tokenizer(args.tok_path, args.texts_path, args.max_vocab_size)
+
