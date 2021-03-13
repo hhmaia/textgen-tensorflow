@@ -11,24 +11,23 @@ from tensorflow.keras.models import load_model
 from parsecorpus import replace_tokens  
 
 
-def gen(model_path, seed_fp, tokenizer_fp, slen, n):
+def gen(model_path, seeds_fp, tokenizer_fp, slen, n):
     tokenizer = tokenizer_from_json(tokenizer_fp.read())
-    seed = seed_fp.read()
-    seed_seqs = tokenizer.texts_to_sequences([replace_tokens(seed)])
-    seed_seq = list(pad_sequences(seed_seqs, slen)[0])
-
+    seeds = seeds_fp.readlines()
+    seed_seqs = tokenizer.texts_to_sequences(map(replace_tokens, seeds))
+    padded_seqs = pad_sequences(seed_seqs, slen)
+    
     model : Model = load_model(model_path)
     model.summary()
     
-    for _ in range(n):
-        seq_input = np.expand_dims(seed_seq[-slen:], 0)
-        pred = model.predict([seq_input], 1)
-        logit = pred.squeeze().argmax()
-        seed_seq.append(logit)
+    for seq in padded_seqs:
+        seq = list(seq)
+        for _ in range(n):
+            seq_input = np.expand_dims(seq[-slen:], 0)
+            pred = model.predict([seq_input], 1)
+            seq.append(pred.squeeze().argmax())
 
-    out_sentences = tokenizer.sequences_to_texts([seed_seq])
-    out_text = ''.join(out_sentences)
-    print(out_text)
+        print(''.join(tokenizer.sequences_to_texts([seq])))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Sentences generation script.')
