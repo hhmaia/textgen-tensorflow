@@ -7,15 +7,15 @@ import argparse
 from regex_token import _regex_token
 
 
-def _replace_tokens(s, regex_token=_regex_token): 
+def replace_tokens(s, regex_token=_regex_token): 
     x = s.lower()
     for p, t in regex_token:
         x = re.sub(p, t, x) 
     return x
 
 
-def _verses_tape(verses):
-    return ''.join(_replace_tokens(verse) for verse in verses) 
+def verses_to_tape(verses):
+    return ''.join(replace_tokens(verse) for verse in verses) 
 
 
 def json_to_verses(path):
@@ -26,7 +26,7 @@ def json_to_verses(path):
 
 
 def json_to_tape(path):
-    return _verses_tape(json_to_verses(path))
+    return verses_to_tape(json_to_verses(path))
 
 
 if __name__ == '__main__': 
