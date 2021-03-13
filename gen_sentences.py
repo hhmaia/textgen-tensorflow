@@ -12,22 +12,29 @@ from parsecorpus import replace_tokens
 
 
 def gen(model_path, seeds_fp, tokenizer_fp, slen, n):
+    seeds = [replace_tokens(seed.strip('\n'))
+             for seed in seeds_fp.readlines()]
     tokenizer = tokenizer_from_json(tokenizer_fp.read())
-    seeds = seeds_fp.readlines()
-    seed_seqs = tokenizer.texts_to_sequences(map(replace_tokens, seeds))
-    padded_seqs = pad_sequences(seed_seqs, slen)
+    seed_seqs = tokenizer.texts_to_sequences(seeds)
+#    padded_seqs = pad_sequences(seed_seqs, slen)
     
     model : Model = load_model(model_path)
     model.summary()
-    
-    for seq in padded_seqs:
-        seq = list(seq)
-        for _ in range(n):
-            seq_input = np.expand_dims(seq[-slen:], 0)
-            pred = model.predict([seq_input], 1)
-            seq.append(pred.squeeze().argmax())
 
-        print(''.join(tokenizer.sequences_to_texts([seq])))
+    feedback = list(np.zeros((32,)))
+    for seq in seed_seqs:
+        feedback.extend(list(seq))
+        for _ in range(1):
+            logit = 0
+            while logit not in [tokenizer.word_index['.']]:
+                seq_input = np.expand_dims(feedback[-slen:], 0)
+                pred = model.predict([seq_input], 1)
+                logit = pred.squeeze().argmax()
+                feedback.append(logit)
+        feedback.append(tokenizer.word_index['\n'])
+
+    out_seq = tokenizer.sequences_to_texts([feedback])
+    print(out_seq[0])
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Sentences generation script.')
