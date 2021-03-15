@@ -10,7 +10,7 @@ def export_model(path, input_seq_len, vocab_size, emb_dim):
         klayers.Embedding(vocab_size+1, emb_dim, input_length=input_seq_len),
         klayers.Bidirectional(klayers.LSTM(256)),
         klayers.BatchNormalization(),
-        klayers.Dense(vocab_size, 'softmax')
+        klayers.Dense(vocab_size+1, 'softmax')
     ])
 
     model.summary()

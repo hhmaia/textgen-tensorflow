@@ -15,7 +15,7 @@ def replace_tokens(s, regex_token=_regex_token):
 
 
 def verses_to_tape(verses):
-    return ''.join(replace_tokens(verse) for verse in verses) 
+    return ' \n '.join(replace_tokens(verse) for verse in verses) 
 
 
 def json_to_verses(path):
