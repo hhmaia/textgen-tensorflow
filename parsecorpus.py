@@ -9,7 +9,7 @@ from regex_token import _regex_token
 
 def replace_tokens(s, regex_token=_regex_token): 
     x = s.lower()
-    for p, t in regex_token:
+    for p, t in regex_token.items():
         x = re.sub(p, t, x) 
     return x
 
